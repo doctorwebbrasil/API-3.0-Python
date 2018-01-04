@@ -36,13 +36,20 @@ class Base(object):
 
         response = s.send(prep)
 
-        if 'json' in response.headers['Content-Type'].lower():
+        try:
+            is_json = 'json' in response.headers['Content-Type'].lower()
+        except KeyError:
+            # Content type not in response.headers
+            is_json = False
+
+        if is_json:
             answers = response.json()
         else:
             answers = [{
                 'Code': str(response.status_code),
                 'Message': response.text
             }]
+
 
         if response.status_code >= 400:
             errors = []
